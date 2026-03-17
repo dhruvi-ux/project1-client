@@ -1,15 +1,16 @@
 # Project Name - Frontend
 
-Frontend built with React.js.
+Frontend built with Angular.
 
 ## 🛠️ Tech Stack
-- React.js
-- Axios
-- React Router
+- Angular
+- TypeScript
+- RxJS
+- Angular Router
 
 ## ⚙️ Run Locally
 npm install
-npm start
+ng serve
 
 ## 🔗 Backend Repo
 https://github.com/your-username/project1-backend
