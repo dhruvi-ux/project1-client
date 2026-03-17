@@ -1,11 +1,12 @@
 import { HttpClient } from '@angular/common/http';
+import { environment } from '../../environments/environment';
 import { Injectable } from '@angular/core';
 import { Observable, of } from 'rxjs';
 import { map, shareReplay, catchError } from 'rxjs/operators';
 
 @Injectable({ providedIn: 'root' })
 export class PackageService {
-  private API = 'http://localhost:8000/api/packages';
+  private API = `${environment.apiUrl}/packages`;
   private cache = new Map<string, any>();
   private cacheTimeout = 5 * 60 * 1000; // 5 minutes cache
 

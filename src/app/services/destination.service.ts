@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
+import { environment } from '../../environments/environment';
 import { Observable } from 'rxjs';
 import { Destination } from '../models/destination.model';
 
@@ -8,8 +9,7 @@ import { Destination } from '../models/destination.model';
 })
 export class DestinationService {
 
-  private apiUrl = 'http://localhost:8000/api/destinations';
-
+  private apiUrl = `${environment.apiUrl}/contacts`;
   constructor(private http: HttpClient) {}
 
   getDestinations(): Observable<Destination[]> {
