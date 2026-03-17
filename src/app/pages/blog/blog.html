@@ -1,0 +1,137 @@
+<div class="blog-page">
+  <!-- Hero Section -->
+  <section class="hero-section">
+    <div class="hero-background">
+      <div class="hero-pattern"></div>
+    </div>
+    <div class="hero-content">
+      <div class="hero-badge">
+        <span class="badge-icon">✈️</span>
+        <span>Travel Stories & Guides</span>
+      </div>
+      <h1 class="hero-title">Discover Your Next Adventure</h1>
+      <p class="hero-subtitle">Explore comprehensive travel guides, insider tips, and inspiring stories from around the world</p>
+    </div>
+  </section>
+
+  <!-- Category Filter -->
+  <section class="filter-section">
+    <div class="container">
+      <div class="filter-header">
+        <h2 class="filter-title">Browse by Category</h2>
+        <p class="filter-subtitle">{{ filteredPosts.length }} articles available</p>
+      </div>
+      <div class="category-pills">
+        <button 
+          *ngFor="let category of categories" 
+          class="category-pill"
+          [class.active]="selectedCategory === category"
+          (click)="filterByCategory(category)">
+          <span class="pill-icon" *ngIf="category === 'All'">🌍</span>
+          <span class="pill-icon" *ngIf="category === 'Travel Tips'">💡</span>
+          <span class="pill-icon" *ngIf="category === 'Romance'">💕</span>
+          <span class="pill-icon" *ngIf="category === 'Culture'">🎭</span>
+          <span class="pill-icon" *ngIf="category === 'Adventure'">⛰️</span>
+          <span class="pill-icon" *ngIf="category === 'Europe'">🇪🇺</span>
+          <span class="pill-icon" *ngIf="category === 'Asia'">🌏</span>
+          <span class="pill-text">{{ category }}</span>
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Loading State -->
+  <div class="loading-container" *ngIf="isLoading">
+    <div class="spinner"></div>
+    <p class="loading-text">Loading amazing stories...</p>
+  </div>
+
+  <!-- Error State -->
+  <div class="error-container" *ngIf="error && !isLoading">
+    <div class="error-icon">😕</div>
+    <h3 class="error-title">Oops! Something went wrong</h3>
+    <p class="error-message">{{ error }}</p>
+    <button class="retry-button" (click)="loadBlogs()">Try Again</button>
+  </div>
+
+  <!-- Blog Posts Grid -->
+  <section class="posts-section" *ngIf="!isLoading && !error">
+    <div class="container">
+      <div class="posts-grid">
+        <article class="blog-card" *ngFor="let post of filteredPosts" (click)="viewBlog(post._id)">
+          <div class="card-image-container">
+            <img 
+              [src]="post.image" 
+              [alt]="post.title" 
+              class="card-image" 
+              loading="lazy"
+              decoding="async">
+            <div class="card-overlay"></div>
+            <div class="card-category-badge">
+              <span class="badge-dot"></span>
+              {{ post.category }}
+            </div>
+          </div>
+          
+          <div class="card-content">
+            <div class="card-meta-row">
+              <div class="meta-group">
+                <span class="meta-icon">👤</span>
+                <span class="meta-text">{{ post.author }}</span>
+              </div>
+              <div class="meta-group">
+                <span class="meta-icon">⏱️</span>
+                <span class="meta-text">{{ post.readTime }}</span>
+              </div>
+            </div>
+            
+            <h2 class="card-title">{{ post.title }}</h2>
+            <p class="card-excerpt">{{ post.excerpt }}</p>
+            
+            <div class="card-footer">
+              <span class="card-date">{{ formatDate(post.createdAt) }}</span>
+            </div>
+          </div>
+        </article>
+      </div>
+
+      <!-- Empty State -->
+      <div class="empty-state" *ngIf="filteredPosts.length === 0">
+        <div class="empty-icon">📭</div>
+        <h3 class="empty-title">No articles found</h3>
+        <p class="empty-message">Try selecting a different category to explore more content</p>
+        <button class="empty-button" (click)="filterByCategory('All')">View All Articles</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Newsletter Section -->
+  <section class="newsletter-section">
+    <div class="container">
+      <div class="newsletter-card">
+        <div class="newsletter-content">
+          <div class="newsletter-icon">✉️</div>
+          <h2 class="newsletter-title">Stay Updated</h2>
+          <p class="newsletter-text">Get the latest travel guides, tips, and destination insights delivered to your inbox</p>
+          <form class="newsletter-form">
+            <input 
+              type="email" 
+              placeholder="Enter your email address" 
+              class="newsletter-input"
+              required>
+            <button type="submit" class="newsletter-button">
+              <span>Subscribe</span>
+              <span class="button-icon">→</span>
+            </button>
+          </form>
+          <p class="newsletter-privacy">We respect your privacy. Unsubscribe anytime.</p>
+        </div>
+        <div class="newsletter-illustration">
+          <div class="illustration-circle circle-1"></div>
+          <div class="illustration-circle circle-2"></div>
+          <div class="illustration-circle circle-3"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>

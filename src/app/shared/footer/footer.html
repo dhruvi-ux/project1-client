@@ -1,0 +1,121 @@
+<footer class="footer">
+  <div class="footer-container">
+    <!-- Brand Section -->
+    <div class="footer-section brand-section">
+      <div class="footer-logo">
+        <span class="footer-logo-icon">✈️</span>
+        <span class="footer-logo-text">LuxWay</span>
+      </div>
+      <p class="footer-tagline">Your trusted partner for unforgettable journeys around the world.</p>
+      <div class="social-links">
+        <a href="#" class="social-link" title="Facebook">
+          <span>📘</span>
+        </a>
+        <a href="#" class="social-link" title="Twitter">
+          <span>🐦</span>
+        </a>
+        <a href="#" class="social-link" title="Instagram">
+          <span>📷</span>
+        </a>
+        <a href="#" class="social-link" title="YouTube">
+          <span>📺</span>
+        </a>
+        <a href="#" class="social-link" title="LinkedIn">
+          <span>💼</span>
+        </a>
+      </div>
+    </div>
+
+    <!-- Quick Links -->
+    <div class="footer-section">
+      <h4 class="footer-title">Quick Links</h4>
+      <ul class="footer-links">
+        <li><a routerLink="/">🏠 Home</a></li>
+        <li><a routerLink="/destination">🌍 Destinations</a></li>
+        <li><a routerLink="/blog">📝 Blog</a></li>
+        <li><a routerLink="/about">ℹ️ About Us</a></li>
+        <li><a routerLink="/contact">📞 Contact</a></li>
+      </ul>
+    </div>
+
+    <!-- Popular Destinations -->
+    <div class="footer-section">
+      <h4 class="footer-title">Popular Destinations</h4>
+      <ul class="footer-links">
+        <li><a routerLink="/destination">🗼 Paris</a></li>
+        <li><a routerLink="/destination">🏔️ Swiss Alps</a></li>
+        <li><a routerLink="/destination">🏯 Kyoto</a></li>
+        <li><a routerLink="/destination">🏛️ Santorini</a></li>
+        <li><a routerLink="/destination">🌊 Queenstown</a></li>
+      </ul>
+    </div>
+
+    <!-- Support -->
+    <div class="footer-section">
+      <h4 class="footer-title">Support</h4>
+      <ul class="footer-links">
+        <li><a routerLink="/my-bookings">🎫 My Bookings</a></li>
+        <li><a routerLink="/profile">👤 My Profile</a></li>
+        <li><a href="#">❓ Help Center</a></li>
+        <li><a href="#">📋 Terms & Conditions</a></li>
+        <li><a href="#">🔒 Privacy Policy</a></li>
+      </ul>
+    </div>
+
+    <!-- Contact Info -->
+    <div class="footer-section">
+      <h4 class="footer-title">Get In Touch</h4>
+      <ul class="footer-contact">
+        <li>
+          <span class="contact-icon">📧</span>
+          <div class="contact-details">
+            <strong>Email</strong>
+            <a href="mailto:info@luxway.com">info&#64;luxway.com</a>
+          </div>
+        </li>
+        <li>
+          <span class="contact-icon">📞</span>
+          <div class="contact-details">
+            <strong>Phone</strong>
+            <a href="tel:+919876543210">+91 98765 43210</a>
+          </div>
+        </li>
+        <li>
+          <span class="contact-icon">📍</span>
+          <div class="contact-details">
+            <strong>Address</strong>
+            <span>Mumbai, India</span>
+          </div>
+        </li>
+        <li>
+          <span class="contact-icon">⏰</span>
+          <div class="contact-details">
+            <strong>Hours</strong>
+            <span>Mon-Sat: 9AM-6PM</span>
+          </div>
+        </li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- Footer Bottom -->
+  <div class="footer-bottom">
+    <div class="footer-bottom-container">
+      <p class="copyright">© 2025 LuxWay. All rights reserved. Made with ❤️ for travelers.</p>
+      <div class="footer-bottom-links">
+        <a href="#">Terms</a>
+        <span class="separator">•</span>
+        <a href="#">Privacy</a>
+        <span class="separator">•</span>
+        <a href="#">Cookies</a>
+        <span class="separator">•</span>
+        <a href="#">Sitemap</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Back to Top Button -->
+  <button class="back-to-top" (click)="scrollToTop()" [class.visible]="showBackToTop" title="Back to top">
+    <span>↑</span>
+  </button>
+</footer>

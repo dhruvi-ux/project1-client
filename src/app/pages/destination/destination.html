@@ -1,0 +1,242 @@
+<div class="destination-page">
+  <!-- Hero Section -->
+  <section class="hero-section">
+    <div class="hero-overlay"></div>
+    <div class="hero-content">
+      <h1 class="hero-title">Explore Dream Destinations</h1>
+      <p class="hero-subtitle">Discover your next adventure with smart filters</p>
+    </div>
+  </section>
+
+  <!-- Sticky Filter Bar -->
+  <div class="filter-bar-wrapper" [class.sticky]="isFilterSticky">
+    <div class="filter-bar">
+      <div class="filter-bar-container">
+        <!-- Filter Buttons -->
+        <div class="filter-buttons">
+          <!-- Mood Filter -->
+          <div class="filter-dropdown" [class.active]="showMoodDropdown">
+            <button class="filter-btn" (click)="toggleDropdown('mood')" [class.has-selection]="selectedMood">
+              <span class="filter-icon">😊</span>
+              <span class="filter-text">{{ selectedMood || 'Mood' }}</span>
+              <span class="filter-arrow">▼</span>
+            </button>
+            <div class="dropdown-menu" *ngIf="showMoodDropdown">
+              <div class="dropdown-header">
+                <span>Select Mood</span>
+                <button class="close-dropdown" (click)="closeDropdown()">✕</button>
+              </div>
+              <div class="dropdown-options">
+                <button 
+                  *ngFor="let mood of moodOptions" 
+                  class="dropdown-option"
+                  [class.selected]="selectedMood === mood"
+                  (click)="selectMood(mood)">
+                  <span class="option-icon">{{ getMoodIcon(mood) }}</span>
+                  <span class="option-text">{{ mood }}</span>
+                  <span class="check-icon" *ngIf="selectedMood === mood">✓</span>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Budget Filter -->
+          <div class="filter-dropdown" [class.active]="showBudgetDropdown">
+            <button class="filter-btn" (click)="toggleDropdown('budget')" [class.has-selection]="selectedBudget">
+              <span class="filter-icon">💰</span>
+              <span class="filter-text">{{ selectedBudget || 'Budget' }}</span>
+              <span class="filter-arrow">▼</span>
+            </button>
+            <div class="dropdown-menu" *ngIf="showBudgetDropdown">
+              <div class="dropdown-header">
+                <span>Select Budget</span>
+                <button class="close-dropdown" (click)="closeDropdown()">✕</button>
+              </div>
+              <div class="dropdown-options">
+                <button 
+                  *ngFor="let budget of budgetOptions" 
+                  class="dropdown-option"
+                  [class.selected]="selectedBudget === budget"
+                  (click)="selectBudget(budget)">
+                  <span class="option-icon">{{ getBudgetIcon(budget) }}</span>
+                  <span class="option-text">{{ budget }}</span>
+                  <span class="check-icon" *ngIf="selectedBudget === budget">✓</span>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Season Filter -->
+          <div class="filter-dropdown" [class.active]="showSeasonDropdown">
+            <button class="filter-btn" (click)="toggleDropdown('season')" [class.has-selection]="selectedSeason">
+              <span class="filter-icon">🌤️</span>
+              <span class="filter-text">{{ selectedSeason || 'Season' }}</span>
+              <span class="filter-arrow">▼</span>
+            </button>
+            <div class="dropdown-menu" *ngIf="showSeasonDropdown">
+              <div class="dropdown-header">
+                <span>Best Season</span>
+                <button class="close-dropdown" (click)="closeDropdown()">✕</button>
+              </div>
+              <div class="dropdown-options">
+                <button 
+                  *ngFor="let season of seasonOptions" 
+                  class="dropdown-option"
+                  [class.selected]="selectedSeason === season"
+                  (click)="selectSeason(season)">
+                  <span class="option-icon">{{ getSeasonIcon(season) }}</span>
+                  <span class="option-text">{{ season }}</span>
+                  <span class="check-icon" *ngIf="selectedSeason === season">✓</span>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Travel Style Filter -->
+          <div class="filter-dropdown" [class.active]="showTravelTypeDropdown">
+            <button class="filter-btn" (click)="toggleDropdown('travelType')" [class.has-selection]="selectedTravelType">
+              <span class="filter-icon">👥</span>
+              <span class="filter-text">{{ selectedTravelType || 'Travel Style' }}</span>
+              <span class="filter-arrow">▼</span>
+            </button>
+            <div class="dropdown-menu" *ngIf="showTravelTypeDropdown">
+              <div class="dropdown-header">
+                <span>Travel Style</span>
+                <button class="close-dropdown" (click)="closeDropdown()">✕</button>
+              </div>
+              <div class="dropdown-options">
+                <button 
+                  *ngFor="let type of travelTypeOptions" 
+                  class="dropdown-option"
+                  [class.selected]="selectedTravelType === type"
+                  (click)="selectTravelType(type)">
+                  <span class="option-icon">{{ getTravelTypeIcon(type) }}</span>
+                  <span class="option-text">{{ type }}</span>
+                  <span class="check-icon" *ngIf="selectedTravelType === type">✓</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Clear & Results -->
+        <div class="filter-actions">
+          <button class="clear-btn" (click)="clearFilters()" *ngIf="hasActiveFilters()">
+            <span class="clear-icon">✕</span>
+            Clear
+          </button>
+          <div class="results-badge">
+            <span class="results-count">{{ filteredDestinations.length }}</span>
+            <span class="results-label">places</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Active Filters Tags -->
+    <div class="active-filters-bar" *ngIf="hasActiveFilters()">
+      <div class="filter-bar-container">
+        <div class="active-tags">
+          <span class="active-tag" *ngIf="selectedMood">
+            {{ getMoodIcon(selectedMood) }} {{ selectedMood }}
+            <button class="remove-tag" (click)="selectedMood = null; applyFilters()">×</button>
+          </span>
+          <span class="active-tag" *ngIf="selectedBudget">
+            {{ getBudgetIcon(selectedBudget) }} {{ selectedBudget }}
+            <button class="remove-tag" (click)="selectedBudget = null; applyFilters()">×</button>
+          </span>
+          <span class="active-tag" *ngIf="selectedSeason">
+            {{ getSeasonIcon(selectedSeason) }} {{ selectedSeason }}
+            <button class="remove-tag" (click)="selectedSeason = null; applyFilters()">×</button>
+          </span>
+          <span class="active-tag" *ngIf="selectedTravelType">
+            {{ getTravelTypeIcon(selectedTravelType) }} {{ selectedTravelType }}
+            <button class="remove-tag" (click)="selectedTravelType = null; applyFilters()">×</button>
+          </span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  <div class="loading-container" *ngIf="isLoading">
+    <div class="spinner"></div>
+    <p class="loading-text">Finding amazing destinations...</p>
+  </div>
+
+  <!-- Destinations Grid -->
+  <section class="destinations-section" *ngIf="!isLoading">
+    <div class="container">
+      <div class="destinations-grid">
+        <article class="destination-card" *ngFor="let dest of filteredDestinations" (click)="viewPackages(dest.name)">
+          <div class="card-image-container">
+            <img 
+              [src]="dest.image" 
+              [alt]="dest.name" 
+              class="card-image"
+              loading="lazy">
+            <div class="card-overlay"></div>
+            
+            <!-- Budget Badge -->
+            <div class="budget-badge" [class]="'budget-' + dest.budgetRange?.toLowerCase()">
+              {{ dest.budgetRange }}
+            </div>
+
+            <!-- Location Badge -->
+            <div class="location-badge">
+              <span class="location-icon">📍</span>
+              {{ dest.location }}
+            </div>
+          </div>
+
+          <div class="card-content">
+            <h3 class="card-title">{{ dest.name }}</h3>
+            
+            <!-- Mood Tags -->
+            <div class="mood-tags" *ngIf="dest.mood && dest.mood.length > 0">
+              <span class="mood-tag" *ngFor="let mood of dest.mood.slice(0, 3)">
+                {{ getMoodIcon(mood) }} {{ mood }}
+              </span>
+            </div>
+
+            <!-- Highlights -->
+            <div class="highlights" *ngIf="dest.highlights && dest.highlights.length > 0">
+              <p class="highlight-item" *ngFor="let highlight of dest.highlights.slice(0, 2)">
+                <span class="highlight-bullet">•</span>
+                {{ highlight }}
+              </p>
+            </div>
+
+            <!-- Budget Info -->
+            <div class="budget-info" *ngIf="dest.estimatedBudget">
+              <span class="budget-label">Daily Budget:</span>
+              <span class="budget-amount">
+                ₹{{ dest.estimatedBudget.min }} - ₹{{ dest.estimatedBudget.max }}
+              </span>
+            </div>
+
+            <!-- Best Season -->
+            <div class="season-info" *ngIf="dest.bestSeason && dest.bestSeason.length > 0">
+              <span class="season-icon">🌤️</span>
+              <span class="season-text">Best: {{ dest.bestSeason.join(', ') }}</span>
+            </div>
+
+            <!-- View Button -->
+            <button class="view-packages-btn">
+              <span>View Packages</span>
+              <span class="btn-arrow">→</span>
+            </button>
+          </div>
+        </article>
+      </div>
+
+      <!-- Empty State -->
+      <div class="empty-state" *ngIf="filteredDestinations.length === 0">
+        <div class="empty-icon">🔍</div>
+        <h3 class="empty-title">No destinations found</h3>
+        <p class="empty-message">Try adjusting your filters to see more options</p>
+        <button class="empty-button" (click)="clearFilters()">Clear All Filters</button>
+      </div>
+    </div>
+  </section>
+</div>

@@ -1,0 +1,197 @@
+<div class="package-detail" *ngIf="!isLoading && package">
+  
+  <!-- Hero Section -->
+  <div class="hero-section">
+    <img [src]="package.heroImage" [alt]="package.packageName" class="hero-image" />
+    <div class="hero-overlay">
+      <div class="hero-content">
+        <div class="package-tags">
+          <span class="package-type">{{ package.packageType }}</span>
+          <div class="rating" *ngIf="package.averageRating">
+            <span class="stars">⭐ {{ package.averageRating }}</span>
+            <span class="review-count">({{ package.userReviews?.length || 0 }} reviews)</span>
+          </div>
+        </div>
+        <h1 class="package-title">{{ package.packageName }}</h1>
+        <div class="package-meta">
+          <div class="meta-item">
+            <span class="meta-icon">📍</span>
+            <span class="meta-text">{{ package.destination | titlecase }}</span>
+          </div>
+          <div class="meta-item">
+            <span class="meta-icon">🗓️</span>
+            <span class="meta-text">{{ package.duration.days }} Days / {{ package.duration.nights }} Nights</span>
+          </div>
+          <div class="meta-item">
+            <span class="meta-icon">💰</span>
+            <span class="meta-text">₹{{ package.price?.amount || 'Contact for pricing' }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Content -->
+  <div class="content-container">
+    <div class="main-content">
+      
+      <!-- Package Highlights -->
+      <div class="highlights-grid">
+        <div class="highlight-card">
+          <div class="highlight-icon">🏨</div>
+          <div class="highlight-content">
+            <h4>Accommodation</h4>
+            <p>{{ package.accommodation }}</p>
+          </div>
+        </div>
+        <div class="highlight-card" *ngIf="package.transportAndTransfer">
+          <div class="highlight-icon">🚗</div>
+          <div class="highlight-content">
+            <h4>Transport & Transfer</h4>
+            <p>{{ package.transportAndTransfer }}</p>
+          </div>
+        </div>
+        <div class="highlight-card" *ngIf="package.meals">
+          <div class="highlight-icon">🍽️</div>
+          <div class="highlight-content">
+            <h4>Meals</h4>
+            <p>{{ package.meals }}</p>
+          </div>
+        </div>
+        <div class="highlight-card" *ngIf="package.averageRating">
+          <div class="highlight-icon">⭐</div>
+          <div class="highlight-content">
+            <h4>Rating</h4>
+            <p>{{ package.averageRating }}/5.0</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Package Details -->
+      <div class="info-section">
+        <h3 class="section-title">Package Details</h3>
+        <div class="details-grid">
+          <div class="inclusions" *ngIf="package.inclusions?.length > 0">
+            <h4><span class="check-icon">✅</span> What's Included</h4>
+            <ul class="items-list">
+              <li *ngFor="let item of package.inclusions">{{ item }}</li>
+            </ul>
+          </div>
+          
+          <div class="exclusions" *ngIf="package.exclusions?.length > 0">
+            <h4><span class="cross-icon">❌</span> What's Not Included</h4>
+            <ul class="items-list">
+              <li *ngFor="let item of package.exclusions">{{ item }}</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- Itinerary -->
+      <div class="info-section" *ngIf="package.itinerary?.length > 0">
+        <h3 class="section-title">Day-by-Day Itinerary</h3>
+        <div class="timeline">
+          <div class="timeline-item" *ngFor="let day of package.itinerary; let i = index">
+            <div class="timeline-marker">
+              <span class="marker-number">{{ day.day }}</span>
+              <span class="marker-label">Day</span>
+            </div>
+            <div class="timeline-content">
+              <h4>{{ day.title }}</h4>
+              <p>{{ day.description }}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Gallery -->
+      <div class="info-section" *ngIf="package.gallery?.length > 0">
+        <h3 class="section-title">Photo Gallery</h3>
+        <div class="gallery">
+          <div class="gallery-item" *ngFor="let img of package.gallery">
+            <img [src]="img" [alt]="'Gallery image'" />
+          </div>
+        </div>
+      </div>
+
+      <!-- Reviews -->
+      <div class="info-section" *ngIf="package.userReviews?.length > 0">
+        <h3 class="section-title">Customer Reviews</h3>
+        <div class="reviews">
+          <div class="review" *ngFor="let review of package.userReviews">
+            <div class="review-header">
+              <div class="reviewer">
+                <div class="reviewer-name">{{ review.userName }}</div>
+                <div class="review-date" *ngIf="review.date">{{ review.date }}</div>
+              </div>
+            </div>
+            <div class="review-rating">
+              <span class="stars">⭐ {{ package.averageRating }}</span>
+            </div>
+            <div class="review-body">
+              <p>{{ review.comment }}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Sidebar Booking -->
+    <div class="sidebar">
+      <div class="booking-card">
+        <div class="price-section" *ngIf="package.price?.amount">
+          <div class="price-display">
+            <span class="price-amount">₹{{ package.price.amount }}</span>
+            <span class="price-label">per person</span>
+          </div>
+          <div class="price-detail">Total for {{ package.duration.days }} days</div>
+        </div>
+        
+        <div class="booking-form">
+          <h3>Ready to Book?</h3>
+          <p>Secure your spot for this amazing journey today!</p>
+          
+          <div class="booking-options">
+            <button class="primary-btn" [routerLink]="['/book', package._id]">
+              <span class="btn-icon">🎫</span>
+              Book Now
+            </button>
+            
+            <button class="secondary-btn" routerLink="/packages/{{ package.destination }}">
+              <span class="btn-icon">←</span>
+              Back to Packages
+            </button>
+          </div>
+          
+          <div class="booking-benefits">
+            <div class="benefit">
+              <span class="benefit-icon">🛡️</span>
+              <span class="benefit-text">24/7 Support</span>
+            </div>
+            <div class="benefit">
+              <span class="benefit-icon">🔄</span>
+              <span class="benefit-text">Easy Cancellation</span>
+            </div>
+            <div class="benefit">
+              <span class="benefit-icon">🔒</span>
+              <span class="benefit-text">Secure Payment</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    
+    </div>
+  </div>
+</div>
+
+<!-- Loading State -->
+<div class="loading" *ngIf="isLoading">
+  <p>Loading package details...</p>
+</div>
+
+<!-- Error State -->
+<div class="error" *ngIf="!isLoading && !package">
+  <h2>Package Not Found</h2>
+  <p>The package you're looking for doesn't exist.</p>
+  <button routerLink="/destination">Browse Destinations</button>
+</div>

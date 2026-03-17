@@ -1,0 +1,220 @@
+import { Component, OnInit } from '@angular/core';
+import { Router, RouterModule } from '@angular/router';
+import { CommonModule, NgFor, NgIf, TitleCasePipe } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { AuthService } from '../../services/auth.service';
+import { BookingService } from '../../services/booking.service';
+import { ContactService } from '../../services/contact.service';
+
+@Component({
+  selector: 'app-profile',
+  standalone: true,
+  imports: [CommonModule, FormsModule, RouterModule, NgFor, NgIf, TitleCasePipe],
+  templateUrl: './profile.html',
+  styleUrls: ['./profile.css']
+})
+export class ProfileComponent implements OnInit {
+  user: any = null;
+  loading = true;
+  editMode = false;
+  saving = false;
+  errorMessage: string = '';
+  successMessage: string = '';
+  userBookings: any[] = [];
+  contactInquiries: any[] = [];
+  settings = {
+    profileVisibility: true,
+    emailNotifications: true,
+    newsletter: false
+  };
+
+  // Properties for modal
+  showBookingModal = false;
+  currentBooking: any = null;
+
+  // Contact form properties
+  showContactForm = false;
+  contactForm = {
+    subject: '',
+    message: ''
+  };
+  contactError: string = '';
+  contactSubmitting = false;
+
+  constructor(
+    private router: Router,
+    private authService: AuthService,
+    private bookingService: BookingService,
+    private contactService: ContactService
+  ) {}
+
+  ngOnInit(): void {
+    this.authService.currentUser$.subscribe(user => {
+      this.user = user;
+      this.loading = false;
+      if (user) {
+        this.loadUserBookings();
+        this.loadContactInquiries();
+      }
+    });
+  }
+
+  trackByBookingId(index: number, booking: any): string {
+    return booking._id || index;
+  }
+
+  trackByInquiryId(index: number, inquiry: any): string {
+    return inquiry._id || index;
+  }
+
+  loadUserBookings(): void {
+    if (this.user && this.user.id) {
+      this.bookingService.getUserBookings(this.user.id).subscribe({
+        next: (response: any) => {
+          const bookingsArray = response?.bookings || [];
+          this.userBookings = bookingsArray.map((booking: any) => ({
+            ...booking,
+            bookingDate: booking.createdAt || booking.bookingDate,
+          }));
+        },
+        error: (err) => {
+          console.error('Error loading user bookings:', err);
+          if (err.status === 401) {
+            this.authService.logout();
+            this.router.navigate(['/login']);
+          }
+        }
+      });
+    }
+  }
+
+  loadContactInquiries(): void {
+    if (this.user && this.user.id) {
+      this.contactService.getUserContacts(this.user.id).subscribe({
+        next: (response: any) => {
+          this.contactInquiries = response.contacts || [];
+        },
+        error: (err) => {
+          console.error('Error loading contact inquiries:', err);
+          this.contactInquiries = [];
+        }
+      });
+    }
+  }
+
+  toggleEditMode(): void {
+    this.editMode = !this.editMode;
+    this.errorMessage = '';
+    this.successMessage = '';
+  }
+
+  saveProfile(): void {
+    if (!this.user?.name || !this.user?.phone) {
+      this.errorMessage = 'Please fill in all required fields';
+      return;
+    }
+
+    this.saving = true;
+    // Simulate API call
+    setTimeout(() => {
+      this.saving = false;
+      this.editMode = false;
+      this.successMessage = 'Profile updated successfully!';
+      setTimeout(() => {
+        this.successMessage = '';
+      }, 3000);
+    }, 1000);
+  }
+
+  logout(): void {
+    this.authService.logout();
+    this.router.navigate(['/login']);
+  }
+
+  formatDate(dateString: string): string {
+    return new Date(dateString).toLocaleDateString();
+  }
+
+  getStatusColor(status: string): string {
+    switch (status) {
+      case 'confirmed':
+        return 'green';
+      case 'cancelled':
+        return 'red';
+      case 'pending':
+        return 'orange';
+      default:
+        return 'gray';
+    }
+  }
+
+  getBookingsByStatus(status: string): any[] {
+    return this.userBookings.filter(booking => booking.status === status);
+  }
+
+  getUserInitials(): string {
+    if (!this.user?.name) return '?';
+    const names = this.user.name.split(' ');
+    return names.map((n: string) => n[0]).join('').toUpperCase().substring(0, 2);
+  }
+
+  viewBookingDetails(booking: any): void {
+    console.log('View booking details:', booking);
+    this.currentBooking = booking;
+    this.showBookingModal = true;
+  }
+
+  closeBookingModal(): void {
+    this.showBookingModal = false;
+    this.currentBooking = null;
+  }
+
+  openContactForm(): void {
+    this.showContactForm = true;
+    this.contactForm = { subject: '', message: '' };
+    this.contactError = '';
+  }
+
+  closeContactForm(): void {
+    this.showContactForm = false;
+    this.contactForm = { subject: '', message: '' };
+    this.contactError = '';
+  }
+
+  submitContact(): void {
+    if (!this.contactForm.subject || !this.contactForm.message) {
+      this.contactError = 'Please fill in all fields';
+      return;
+    }
+
+    if (this.contactForm.message.length < 10) {
+      this.contactError = 'Message must be at least 10 characters long';
+      return;
+    }
+
+    this.contactSubmitting = true;
+    this.contactError = '';
+
+    if (this.user && this.user.id) {
+      this.contactService.createContact(
+        this.user.id,
+        this.contactForm.subject,
+        this.contactForm.message
+      ).subscribe({
+        next: (response: any) => {
+          this.contactSubmitting = false;
+          this.contactInquiries.unshift(response.contact);
+          this.closeContactForm();
+          // Show success message
+          this.successMessage = 'Inquiry sent successfully!';
+          setTimeout(() => {
+            this.successMessage = '';
+          }, 3000);
+        },
+        error: (err) => {
+          this.contactSubmitting = false;
+          this.contactError = err.error?.message || 'Error sending inquiry. Please try again.';
+        }
+      });
+    }
+  }

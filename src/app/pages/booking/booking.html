@@ -1,0 +1,320 @@
+<div class="booking-container">
+  <div class="booking-header">
+    <h1>Complete Your Booking</h1>
+    <p>Review your package details and fill in your information</p>
+  </div>
+
+  <div class="error-message" *ngIf="bookingError">
+    {{ bookingError }}
+    <button class="btn btn-primary" routerLink="/packages" *ngIf="!packageId">Browse Packages</button>
+  </div>
+
+  <div class="booking-content">
+    <div class="booking-summary">
+      <div class="package-preview" *ngIf="package">
+        <div class="preview-image">
+          <img [src]="package?.heroImage || 'https://via.placeholder.com/400x250'" [alt]="package?.packageName" />
+        </div>
+        <div class="preview-details">
+          <h2>{{ package?.packageName }}</h2>
+          <p class="destination"><i class="fas fa-map-marker-alt"></i> {{ package?.destination | titlecase }}</p>
+          <div class="duration">
+            <span><i class="fas fa-calendar"></i> {{ package?.duration?.days }} Days / {{ package?.duration?.nights }} Nights</span>
+          </div>
+          <div class="price">
+            <span class="amount">₹{{ package?.price?.amount | number:'1.0-0' }}</span>
+            <span class="per-person">per person</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Package Details Section -->
+      <div class="package-details-section" *ngIf="package">
+        <h3>Package Overview</h3>
+        <div class="overview-grid">
+          <div class="overview-item" *ngIf="package?.accommodation">
+            <div class="item-icon">🏨</div>
+            <div class="item-content">
+              <h4>Accommodation</h4>
+              <p>{{ package?.accommodation }}</p>
+            </div>
+          </div>
+          <div class="overview-item" *ngIf="package?.transportAndTransfer">
+            <div class="item-icon">🚗</div>
+            <div class="item-content">
+              <h4>Transport & Transfer</h4>
+              <p>{{ package?.transportAndTransfer }}</p>
+            </div>
+          </div>
+          <div class="overview-item" *ngIf="package?.meals">
+            <div class="item-icon">🍽️</div>
+            <div class="item-content">
+              <h4>Meals</h4>
+              <p>{{ package?.meals }}</p>
+            </div>
+          </div>
+          <div class="overview-item" *ngIf="package?.averageRating != null">
+            <div class="item-icon">⭐</div>
+            <div class="item-content">
+              <h4>Rating</h4>
+              <p>{{ package?.averageRating }}/5.0 ({{ package?.userReviews?.length || 0 }} reviews)</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Inclusions & Exclusions -->
+      <div class="inclusions-exclusions" *ngIf="package && ((package?.inclusions && package?.inclusions.length > 0) || (package?.exclusions && package?.exclusions.length > 0))">
+        <div class="inclusions" *ngIf="package?.inclusions && package?.inclusions.length > 0">
+          <h4><span class="check-icon">✅</span> What's Included</h4>
+          <ul class="items-list">
+            <li *ngFor="let item of package?.inclusions">{{ item }}</li>
+          </ul>
+        </div>
+        
+        <div class="exclusions" *ngIf="package?.exclusions && package?.exclusions.length > 0">
+          <h4><span class="cross-icon">❌</span> What's Not Included</h4>
+          <ul class="items-list">
+            <li *ngFor="let item of package?.exclusions">{{ item }}</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Itinerary -->
+      <div class="itinerary-section" *ngIf="package && package?.itinerary && package?.itinerary.length > 0">
+        <h3 (click)="showItinerary()">Day-by-Day Itinerary <span class="expand-icon" *ngIf="!isItineraryVisible">▼</span><span class="expand-icon" *ngIf="isItineraryVisible">▲</span></h3>
+        <div class="timeline" *ngIf="isItineraryVisible">
+          <div class="timeline-item" *ngFor="let day of package?.itinerary; let i = index; trackBy: trackById">
+            <div class="timeline-marker">
+              <span class="marker-number">{{ day?.day }}</span>
+              <span class="marker-label">Day</span>
+            </div>
+            <div class="timeline-content">
+              <h4>{{ day?.title }}</h4>
+              <p>{{ day?.description }}</p>
+            </div>
+          </div>
+        </div>
+        <div class="lazy-load-prompt" *ngIf="!isItineraryVisible" (click)="showItinerary()">
+          Click to view detailed itinerary ({{ package?.itinerary?.length }} days)
+        </div>
+      </div>
+
+      <!-- Gallery Preview -->
+      <div class="gallery-preview" *ngIf="package && package?.gallery && package?.gallery.length > 0">
+        <h3 (click)="showGallery()">Gallery Preview <span class="expand-icon" *ngIf="!isGalleryVisible">▼</span><span class="expand-icon" *ngIf="isGalleryVisible">▲</span></h3>
+        <div class="gallery-thumbs" *ngIf="isGalleryVisible">
+          <img 
+            *ngFor="let img of package?.gallery; trackBy: trackByIndex" 
+            [src]="img" 
+            [alt]="'Gallery image'" 
+            class="gallery-thumb"
+            loading="lazy"
+          />
+        </div>
+        <div class="lazy-load-prompt" *ngIf="!isGalleryVisible" (click)="showGallery()">
+          Click to view gallery ({{ package?.gallery?.length }} photos)
+        </div>
+        <div class="gallery-counter" *ngIf="isGalleryVisible">
+          Showing {{ package?.gallery?.length }} photos
+        </div>
+      </div>
+    </div>
+
+    <!-- Loading state for package details -->
+    <div class="package-loading" *ngIf="!package && packageId && !bookingError">
+      <div class="spinner"></div>
+      <p>Loading package details...</p>
+    </div>
+
+    <!-- Error state for package details -->
+    <div class="package-error" *ngIf="!package && packageId && !bookingError">
+      <p>Package not found. Please try again or select a different package.</p>
+    </div>
+
+    <div class="booking-form-section">
+      <div class="customer-info">
+        <h3>Customer Information</h3>
+        <div class="form-grid">
+          <div class="form-group">
+            <label for="firstName">First Name *</label>
+            <input 
+              type="text" 
+              id="firstName" 
+              [(ngModel)]="customerDetails.firstName" 
+              class="form-control" 
+              placeholder="Enter your first name"
+            />
+          </div>
+          <div class="form-group">
+            <label for="lastName">Last Name *</label>
+            <input 
+              type="text" 
+              id="lastName" 
+              [(ngModel)]="customerDetails.lastName" 
+              class="form-control" 
+              placeholder="Enter your last name"
+            />
+          </div>
+          <div class="form-group">
+            <label for="email">Email *</label>
+            <input 
+              type="email" 
+              id="email" 
+              [(ngModel)]="customerDetails.email" 
+              class="form-control" 
+              placeholder="Enter your email"
+            />
+          </div>
+          <div class="form-group">
+            <label for="phone">Phone *</label>
+            <input 
+              type="tel" 
+              id="phone" 
+              [(ngModel)]="customerDetails.phone" 
+              class="form-control" 
+              placeholder="Enter your phone number"
+            />
+          </div>
+          <div class="form-group full-width">
+            <label for="address">Address *</label>
+            <input 
+              type="text" 
+              id="address" 
+              [(ngModel)]="customerDetails.address" 
+              class="form-control" 
+              placeholder="Enter your address"
+            />
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="city">City *</label>
+              <input 
+                type="text" 
+                id="city" 
+                [(ngModel)]="customerDetails.city" 
+                class="form-control" 
+                placeholder="Enter your city"
+              />
+            </div>
+            <div class="form-group">
+              <label for="zipCode">ZIP Code *</label>
+              <input 
+                type="text" 
+                id="zipCode" 
+                [(ngModel)]="customerDetails.zipCode" 
+                class="form-control" 
+                placeholder="Enter ZIP code"
+              />
+            </div>
+            <div class="form-group">
+              <label for="country">Country *</label>
+              <input 
+                type="text" 
+                id="country" 
+                [(ngModel)]="customerDetails.country" 
+                class="form-control" 
+                placeholder="Enter your country"
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="booking-details">
+        <h3>Booking Details</h3>
+        <div class="booking-options">
+          <div class="form-group">
+            <label for="numberOfTravelers">Number of Travelers *</label>
+            <select 
+              id="numberOfTravelers" 
+              [(ngModel)]="numberOfTravelers" 
+              class="form-control"
+            >
+              <option value="1">1 Traveler</option>
+              <option value="2">2 Travelers</option>
+              <option value="3">3 Travelers</option>
+              <option value="4">4 Travelers</option>
+              <option value="5">5 Travelers</option>
+              <option value="6">6 Travelers</option>
+              <option value="7">7 Travelers</option>
+              <option value="8">8 Travelers</option>
+              <option value="9">9 Travelers</option>
+              <option value="10">10 Travelers</option>
+            </select>
+          </div>
+          <div class="form-group full-width">
+            <label for="specialRequests">Special Requests</label>
+            <textarea 
+              id="specialRequests" 
+              [(ngModel)]="specialRequests" 
+              class="form-control" 
+              rows="3" 
+              placeholder="Any special requests or requirements..."
+            ></textarea>
+          </div>
+        </div>
+      </div>
+
+      <div class="booking-summary-panel">
+        <h3>Booking Summary</h3>
+        <div class="summary-item">
+          <span>Package</span>
+          <span>{{ package?.packageName }}</span>
+        </div>
+        <div class="summary-item">
+          <span>Duration</span>
+          <span>{{ package?.duration?.days }} Days / {{ package?.duration?.nights }} Nights</span>
+        </div>
+        <div class="summary-item">
+          <span>Price per person</span>
+          <span>₹{{ package?.price?.amount | number:'1.0-0' }}</span>
+        </div>
+        <div class="summary-item">
+          <span>Number of travelers</span>
+          <span>{{ numberOfTravelers }}</span>
+        </div>
+        <div class="summary-divider"></div>
+        <div class="summary-total">
+          <span>Total Amount</span>
+          <span class="total-amount">₹{{ calculateTotal() | number:'1.0-0' }}</span>
+        </div>
+      </div>
+
+      <div class="booking-actions" *ngIf="!bookingSuccess">
+        <button type="button" class="btn btn-secondary" (click)="goBack()">
+          <i class="fas fa-arrow-left"></i> Back to Package
+        </button>
+        <button type="button" class="btn btn-primary" (click)="submitBooking()" [disabled]="!isBookingEnabled()">
+          <i class="fas fa-check-circle"></i> 
+          <span *ngIf="currentUser && package && isBookingEnabled()">Confirm Booking</span>
+          <span *ngIf="!currentUser && !package">Loading...</span>
+          <span *ngIf="currentUser && !package">Loading Package...</span>
+          <span *ngIf="!currentUser && package">Login Required</span>
+          <span *ngIf="currentUser && package && !isBookingEnabled()">Complete Required Fields</span>
+        </button>
+      </div>
+      
+      <div class="auth-prompt" *ngIf="!currentUser && package && !bookingSuccess">
+        <p><i class="fas fa-lock"></i> You must be logged in to book this package. <a routerLink="/login" class="login-link">Login here</a></p>
+      </div>
+      
+      <div class="form-validation-prompt" *ngIf="currentUser && package && !isBookingEnabled() && !bookingSuccess">
+        <p><i class="fas fa-exclamation-circle"></i> Please fill in all required fields to enable booking.</p>
+      </div>
+
+      <div class="booking-success" *ngIf="bookingSuccess">
+        <div class="success-icon">
+          <i class="fas fa-check-circle"></i>
+        </div>
+        <h3>Booking Confirmed!</h3>
+        <p>Your booking has been successfully submitted. We'll send you a confirmation email shortly.</p>
+        <p>You'll be redirected to your profile page shortly...</p>
+      </div>
+
+      <div class="error-message" *ngIf="bookingError">
+        {{ bookingError }}
+      </div>
+    </div>
+  </div>
+</div>

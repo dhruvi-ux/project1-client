@@ -1,0 +1,402 @@
+<div class="profile-page">
+
+  <!-- Main Content -->
+  <div class="profile-container">
+    <!-- Page Header -->
+    <div class="page-header">
+      <h1>Profile</h1>
+      <p>View all your profile details here.</p>
+    </div>
+
+    <!-- Profile Layout -->
+    <div class="profile-layout">
+      <!-- Left Side - Profile Card -->
+      <div class="profile-left">
+        <div class="profile-card">
+          <!-- Avatar -->
+          <div class="avatar-section">
+            <div class="avatar-large">{{ getUserInitials() }}</div>
+            <div class="online-indicator"></div>
+          </div>
+
+          <!-- User Name and Role -->
+          <h2 class="profile-name">{{ user?.name || 'User' }}</h2>
+          <p class="profile-role">Premium User</p>
+
+          <!-- Social Media -->
+          <div class="social-media">
+            <h3>Social Media</h3>
+            <div class="social-links">
+              <a href="#" class="social-link youtube">
+                <span class="social-icon">▶️</span>
+              </a>
+              <a href="#" class="social-link instagram">
+                <span class="social-icon">📷</span>
+              </a>
+              <a href="#" class="social-link tiktok">
+                <span class="social-icon">🎵</span>
+              </a>
+            </div>
+          </div>
+
+          <!-- Action Buttons -->
+          <div class="profile-actions">
+            <button class="btn-edit" (click)="toggleEditMode()">✏️ Edit Profile</button>
+            <button class="btn-logout" (click)="logout()">🚪 Logout</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right Side - Bio & Details -->
+      <div class="profile-right">
+        <!-- Bio & Other Details Card -->
+        <div class="details-card">
+          <div class="card-header">
+            <h3 class="card-title">Bio & other details</h3>
+            <button class="btn-edit-details" *ngIf="!editMode" (click)="toggleEditMode()">✏️ Edit</button>
+            <div class="edit-actions" *ngIf="editMode">
+              <button class="btn-save-edit" (click)="saveProfile()">✓ Save</button>
+              <button class="btn-cancel-edit" (click)="toggleEditMode()">✕ Cancel</button>
+            </div>
+          </div>
+
+          <div class="online-status">
+            <span class="status-dot"></span>
+            <span class="status-text">Online</span>
+          </div>
+
+          <!-- Details Grid -->
+          <div class="details-grid">
+            <!-- Name -->
+            <div class="detail-row">
+              <span class="detail-label">Full Name</span>
+              <span class="detail-value" *ngIf="!editMode">{{ user?.name || 'Not provided' }}</span>
+              <input class="detail-input" *ngIf="editMode" type="text" [(ngModel)]="user.name" placeholder="Enter your name">
+            </div>
+
+            <!-- Email -->
+            <div class="detail-row">
+              <span class="detail-label">Email</span>
+              <span class="detail-value">{{ user?.email || 'Not provided' }}</span>
+            </div>
+
+            <!-- Phone -->
+            <div class="detail-row">
+              <span class="detail-label">Phone</span>
+              <span class="detail-value" *ngIf="!editMode">{{ user?.phone || 'Not provided' }}</span>
+              <input class="detail-input" *ngIf="editMode" type="tel" [(ngModel)]="user.phone" placeholder="Enter your phone">
+            </div>
+
+            <!-- Member Since -->
+            <div class="detail-row">
+              <span class="detail-label">Member Since</span>
+              <span class="detail-value">{{ user?.createdAt ? (user.createdAt | date:'MMMM yyyy') : 'N/A' }}</span>
+            </div>
+
+            <!-- Account Status -->
+            <div class="detail-row">
+              <span class="detail-label">Account Status</span>
+              <span class="detail-value status-active">Active</span>
+            </div>
+
+            <!-- Total Bookings -->
+            <div class="detail-row">
+              <span class="detail-label">Total Bookings</span>
+              <span class="detail-value">{{ userBookings.length }}</span>
+            </div>
+
+            <!-- Confirmed Bookings -->
+            <div class="detail-row">
+              <span class="detail-label">Confirmed Bookings</span>
+              <span class="detail-value">{{ getBookingsByStatus('confirmed').length }}</span>
+            </div>
+          </div>
+
+          <div class="success-message" *ngIf="successMessage">
+            <span class="success-icon">✓</span>
+            <span>{{ successMessage }}</span>
+          </div>
+        </div>
+
+        <!-- Contact Details Card -->
+        <div class="contact-card">
+          <h3 class="card-title">Contact Inquiries</h3>
+          <p class="contact-subtitle">Messages you've sent to our admin team</p>
+
+          <!-- Empty State -->
+          <div *ngIf="contactInquiries.length === 0" class="empty-contact">
+            <div class="empty-icon">💬</div>
+            <p>No inquiries yet</p>
+            <button class="btn-send-inquiry" (click)="openContactForm()">Send an Inquiry</button>
+          </div>
+
+          <!-- Contact List -->
+          <div *ngIf="contactInquiries.length > 0" class="contact-list">
+            <div *ngFor="let inquiry of contactInquiries; trackBy: trackByInquiryId" class="contact-item">
+              <div class="contact-header">
+                <h4>{{ inquiry.subject || 'Inquiry' }}</h4>
+                <span class="contact-badge" [class]="'status-' + (inquiry.status || 'pending')">
+                  {{ (inquiry.status || 'pending') | titlecase }}
+                </span>
+              </div>
+              <p class="contact-date">📅 {{ formatDate(inquiry.createdAt) }}</p>
+              <p class="contact-message">{{ inquiry.message.length > 80 ? (inquiry.message | slice:0:80) + '...' : inquiry.message }}</p>
+
+              <!-- Admin Reply Preview -->
+              <div *ngIf="inquiry.adminReply?.message" class="admin-reply-preview">
+                <span class="reply-icon">💬</span>
+                <span>Admin replied · {{ formatDate(inquiry.adminReply.repliedAt) }}</span>
+              </div>
+              <div *ngIf="!inquiry.adminReply?.message" class="no-reply-preview">
+                <span>⏳ Awaiting reply</span>
+              </div>
+
+              <button class="btn-view-inquiry" (click)="viewInquiryDetails(inquiry)">View Details →</button>
+            </div>
+
+            <button class="btn-send-inquiry" (click)="openContactForm()">Send New Inquiry</button>
+          </div>
+        </div>
+
+        <!-- Bookings Section -->
+        <div class="bookings-section">
+          <div class="section-header">
+            <h3>My Bookings</h3>
+            <a routerLink="/packages" class="btn-new-booking">➕ New Booking</a>
+          </div>
+
+          <!-- Empty State -->
+          <div *ngIf="userBookings.length === 0" class="empty-state">
+            <div class="empty-icon">🎫</div>
+            <p>No bookings yet</p>
+            <a routerLink="/packages" class="btn-explore">Explore Packages</a>
+          </div>
+
+          <!-- Bookings List -->
+          <div *ngIf="userBookings.length > 0" class="bookings-list">
+            <div 
+              *ngFor="let booking of userBookings; trackBy: trackByBookingId" 
+              class="booking-card"
+            >
+              <div class="booking-header">
+                <h4>{{ booking.packageName || 'Package' }}</h4>
+                <span class="booking-status" [class]="'status-' + (booking.status || 'pending')">
+                  {{ (booking.status || 'pending') | titlecase }}
+                </span>
+              </div>
+
+              <div class="booking-info">
+                <div class="info-item">
+                  <span class="info-label">📍 Destination</span>
+                  <span class="info-value">{{ booking.destination || 'N/A' }}</span>
+                </div>
+                <div class="info-item">
+                  <span class="info-label">👥 Travelers</span>
+                  <span class="info-value">{{ booking.numberOfTravelers || 1 }}</span>
+                </div>
+                <div class="info-item">
+                  <span class="info-label">💰 Amount</span>
+                  <span class="info-value">₹{{ booking.totalAmount || 0 | number }}</span>
+                </div>
+                <div class="info-item">
+                  <span class="info-label">📅 Date</span>
+                  <span class="info-value">{{ formatDate(booking.bookingDate || booking.createdAt) }}</span>
+                </div>
+              </div>
+
+              <button class="btn-view-details" (click)="viewBookingDetails(booking)">
+                View Details →
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Booking Details Modal -->
+  <div class="modal-backdrop" *ngIf="showBookingModal" (click)="closeBookingModal()">
+    <div class="modal-card" *ngIf="currentBooking" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h2>Booking Details</h2>
+        <button class="modal-close" (click)="closeBookingModal()">✕</button>
+      </div>
+
+      <div class="modal-body">
+        <div class="modal-status" [class]="'status-' + (currentBooking.status || 'pending')">
+          {{ (currentBooking.status || 'pending') | titlecase }}
+        </div>
+
+        <div class="modal-section">
+          <h3>Package Information</h3>
+          <div class="modal-grid">
+            <div class="modal-item">
+              <span class="item-label">Package Name</span>
+              <span class="item-value">{{ currentBooking.packageName || 'N/A' }}</span>
+            </div>
+            <div class="modal-item">
+              <span class="item-label">Destination</span>
+              <span class="item-value">{{ currentBooking.destination || 'N/A' }}</span>
+            </div>
+            <div class="modal-item" *ngIf="currentBooking.packageDetails?.duration">
+              <span class="item-label">Duration</span>
+              <span class="item-value">{{ currentBooking.packageDetails.duration.days }}D / {{ currentBooking.packageDetails.duration.nights }}N</span>
+            </div>
+            <div class="modal-item" *ngIf="currentBooking.packageDetails?.price">
+              <span class="item-label">Price Per Person</span>
+              <span class="item-value">₹{{ currentBooking.packageDetails.price.amount | number }}</span>
+            </div>
+            <div class="modal-item">
+              <span class="item-label">Total Amount</span>
+              <span class="item-value">₹{{ currentBooking.totalAmount || 0 | number }}</span>
+            </div>
+            <div class="modal-item">
+              <span class="item-label">Travelers</span>
+              <span class="item-value">{{ currentBooking.numberOfTravelers || 0 }}</span>
+            </div>
+            <div class="modal-item">
+              <span class="item-label">Booking Date</span>
+              <span class="item-value">{{ formatDate(currentBooking.bookingDate || currentBooking.createdAt) }}</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-section">
+          <h3>Customer Information</h3>
+          <div class="modal-grid">
+            <div class="modal-item">
+              <span class="item-label">Full Name</span>
+              <span class="item-value">{{ currentBooking.customerDetails?.firstName }} {{ currentBooking.customerDetails?.lastName }}</span>
+            </div>
+            <div class="modal-item">
+              <span class="item-label">Email</span>
+              <span class="item-value">{{ currentBooking.customerDetails?.email }}</span>
+            </div>
+            <div class="modal-item">
+              <span class="item-label">Phone</span>
+              <span class="item-value">{{ currentBooking.customerDetails?.phone }}</span>
+            </div>
+            <div class="modal-item full-width">
+              <span class="item-label">Address</span>
+              <span class="item-value">{{ currentBooking.customerDetails?.address }}, {{ currentBooking.customerDetails?.city }}, {{ currentBooking.customerDetails?.country }} {{ currentBooking.customerDetails?.zipCode }}</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-section" *ngIf="currentBooking.specialRequests">
+          <h3>Special Requests</h3>
+          <p class="special-requests-text">{{ currentBooking.specialRequests }}</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Inquiry Details Modal -->
+  <div class="modal-backdrop" *ngIf="showInquiryModal" (click)="closeInquiryModal()">
+    <div class="modal-card" *ngIf="currentInquiry" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h2>Inquiry Details</h2>
+        <button class="modal-close" (click)="closeInquiryModal()">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="modal-status" [class]="'status-' + (currentInquiry.status || 'pending')">
+          {{ (currentInquiry.status || 'pending') | titlecase }}
+        </div>
+
+        <div class="modal-section">
+          <h3>Your Message</h3>
+          <div class="modal-grid">
+            <div class="modal-item full-width">
+              <span class="item-label">Subject</span>
+              <span class="item-value">{{ currentInquiry.subject }}</span>
+            </div>
+            <div class="modal-item full-width">
+              <span class="item-label">Message</span>
+              <span class="item-value">{{ currentInquiry.message }}</span>
+            </div>
+            <div class="modal-item">
+              <span class="item-label">Sent On</span>
+              <span class="item-value">{{ formatDate(currentInquiry.createdAt) }}</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-section" *ngIf="currentInquiry.adminReply?.message">
+          <h3>💬 Admin Reply</h3>
+          <div class="modal-grid">
+            <div class="modal-item full-width">
+              <span class="item-label">Reply</span>
+              <span class="item-value">{{ currentInquiry.adminReply.message }}</span>
+            </div>
+            <div class="modal-item">
+              <span class="item-label">Replied On</span>
+              <span class="item-value">{{ formatDate(currentInquiry.adminReply.repliedAt) }}</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-section" *ngIf="!currentInquiry.adminReply?.message">
+          <p class="awaiting-reply">⏳ Your inquiry is pending. Admin will reply soon.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Contact Form Modal -->
+  <div class="modal-backdrop" *ngIf="showContactForm" (click)="closeContactForm()">
+    <div class="modal-card contact-modal" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h2>Send Inquiry to Admin</h2>
+        <button class="modal-close" (click)="closeContactForm()">✕</button>
+      </div>
+
+      <div class="modal-body">
+        <form (ngSubmit)="submitContact()" #contactFormRef="ngForm">
+          <div class="form-group">
+            <label for="subject">Subject</label>
+            <input 
+              type="text" 
+              id="subject" 
+              name="subject"
+              [(ngModel)]="contactForm.subject"
+              placeholder="Enter inquiry subject"
+              required
+              maxlength="100"
+              class="form-input"
+            />
+          </div>
+
+          <div class="form-group">
+            <label for="message">Message</label>
+            <textarea 
+              id="message" 
+              name="message"
+              [(ngModel)]="contactForm.message"
+              placeholder="Enter your message (minimum 10 characters)"
+              required
+              minlength="10"
+              maxlength="5000"
+              rows="6"
+              class="form-textarea"
+            ></textarea>
+            <span class="char-count">{{ (contactForm.message || '').length }}/5000</span>
+          </div>
+
+          <div class="error-message" *ngIf="contactError">
+            <span class="error-icon">⚠️</span>
+            <span>{{ contactError }}</span>
+          </div>
+
+          <div class="form-actions">
+            <button type="button" class="btn-cancel-form" (click)="closeContactForm()">Cancel</button>
+            <button type="submit" class="btn-submit-form" [disabled]="!contactFormRef.valid || contactSubmitting">
+              <span *ngIf="!contactSubmitting">Send Inquiry</span>
+              <span *ngIf="contactSubmitting">Sending...</span>
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+</div>

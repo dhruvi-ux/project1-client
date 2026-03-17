@@ -1,0 +1,83 @@
+<div class="packages-page">
+  
+  <!-- Page Header -->
+  <div class="page-header">
+    <h1 class="title" *ngIf="destination">{{ destination | titlecase }} Travel Packages</h1>
+    <h1 class="title" *ngIf="!destination">All Travel Packages</h1>
+    <p class="subtitle" *ngIf="destination">Discover amazing experiences in {{ destination | titlecase }}</p>
+    <p class="subtitle" *ngIf="!destination">Discover amazing experiences around the world</p>
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="packages.length === 0" class="empty-state">
+    <div class="empty-icon">📦</div>
+    <h3>No packages available</h3>
+    <p *ngIf="destination">Check back soon for exciting travel packages to {{ destination | titlecase }}</p>
+    <p *ngIf="!destination">Check back soon for exciting travel packages</p>
+  </div>
+
+  <!-- Packages Grid -->
+  <div class="package-grid" *ngIf="packages.length > 0">
+    
+    <div class="package-card" *ngFor="let pkg of packages">
+      
+      <!-- Image Section -->
+      <div class="card-image">
+        <img [src]="pkg.heroImage" [alt]="pkg.packageName" />
+        <div class="image-overlay">
+          <span class="package-type">{{ pkg.packageType }}</span>
+        </div>
+      </div>
+
+      <!-- Content Section -->
+      <div class="card-content">
+        
+        <h3 class="package-name">{{ pkg.packageName }}</h3>
+        
+        <!-- Duration & Accommodation -->
+        <div class="package-info">
+          <div class="info-item">
+            <span class="icon">🗓️</span>
+            <span>{{ pkg.duration.days }}D / {{ pkg.duration.nights }}N</span>
+          </div>
+          <div class="info-item">
+            <span class="icon">🏨</span>
+            <span>{{ pkg.accommodation }}</span>
+          </div>
+        </div>
+
+        <!-- Rating -->
+        <div class="rating" *ngIf="pkg.averageRating">
+          <span class="stars">⭐ {{ pkg.averageRating }}</span>
+          <span class="reviews">({{ pkg.userReviews?.length || 0 }} reviews)</span>
+        </div>
+
+        <!-- Price Display -->
+        <div class="package-price">
+          <span class="price-amount">₹{{ pkg.price?.amount }}</span>
+          <span class="price-label">per person</span>
+        </div>
+        
+        <!-- Inclusions Preview -->
+        <div class="inclusions" *ngIf="pkg.inclusions?.length > 0">
+          <span class="inclusion-badge" *ngFor="let item of pkg.inclusions.slice(0, 3)">
+            ✓ {{ item }}
+          </span>
+          <span class="more" *ngIf="pkg.inclusions.length > 3">
+            +{{ pkg.inclusions.length - 3 }} more
+          </span>
+        </div>
+
+        <!-- View Details Button -->
+        <button class="btn-details" [routerLink]="['/package', pkg._id]">
+          View Details
+          <span class="arrow">→</span>
+        </button>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</div>

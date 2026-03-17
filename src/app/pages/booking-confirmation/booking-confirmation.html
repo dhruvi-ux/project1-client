@@ -1,0 +1,133 @@
+<div class="confirmation-container">
+  <div class="confirmation-header">
+    <div class="confirmation-badge">
+      <span class="status-icon">🎉</span>
+      <h2>Booking Confirmed!</h2>
+      <p class="thank-you-text">Thank you for choosing us for your journey. We're excited to make your travel experience memorable!</p>
+    </div>
+  </div>
+
+  <div class="confirmation-content" *ngIf="!isLoading && booking">
+    <div class="booking-details">
+      <div class="section-header">
+        <h3>Booking Information</h3>
+        <div class="booking-id">Booking ID: {{ booking._id }}</div>
+      </div>
+      
+      <div class="info-grid">
+        <div class="info-item">
+          <label>Booking Date</label>
+          <span>{{ formatDate(booking.createdAt) }}</span>
+        </div>
+        <div class="info-item">
+          <label>Booking Status</label>
+          <span class="status-badge" [class]="booking.status || 'confirmed'">{{ booking.status || 'Confirmed' }}</span>
+        </div>
+        <div class="info-item">
+          <label>Total Amount</label>
+          <span class="total-amount">{{ formatCurrency(booking.totalAmount) }}</span>
+        </div>
+        <div class="info-item">
+          <label>Number of Travelers</label>
+          <span>{{ booking.numberOfTravelers }}</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="package-section">
+      <div class="section-header">
+        <h3>Package Details</h3>
+      </div>
+      
+      <div class="package-card">
+        <div class="package-image">
+          <img [src]="booking.packageDetails?.heroImage || 'https://via.placeholder.com/400x250'" [alt]="booking.packageDetails?.packageName" />
+        </div>
+        <div class="package-info">
+          <h4>{{ booking.packageDetails?.packageName || booking.packageName }}</h4>
+          <p class="destination"><i class="fas fa-map-marker-alt"></i> {{ booking.packageDetails?.destination || booking.destination | titlecase }}</p>
+          <div class="duration">
+            <span><i class="fas fa-calendar"></i> {{ booking.packageDetails?.duration?.days || booking.duration?.days }} Days / {{ booking.packageDetails?.duration?.nights || booking.duration?.nights }} Nights</span>
+          </div>
+          <div class="price">
+            <span class="amount">{{ formatCurrency(booking.packageDetails?.price?.amount || booking.price?.amount) }}</span>
+            <span class="per-person">per person</span>
+          </div>
+          <div class="meta-info">
+            <div class="meta-item">
+              <i class="fas fa-bed"></i>
+              <span>{{ booking.packageDetails?.accommodation || booking.accommodation || 'N/A' }}</span>
+            </div>
+            <div class="meta-item">
+              <i class="fas fa-car"></i>
+              <span>{{ booking.packageDetails?.transportAndTransfer || booking.transportAndTransfer || 'N/A' }}</span>
+            </div>
+            <div class="meta-item">
+              <i class="fas fa-utensils"></i>
+              <span>{{ booking.packageDetails?.meals || booking.meals || 'N/A' }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="customer-section">
+      <div class="section-header">
+        <h3>Customer Information</h3>
+      </div>
+      
+      <div class="customer-details">
+        <div class="info-grid">
+          <div class="info-item">
+            <label>Full Name</label>
+            <span>{{ booking.customerDetails?.firstName }} {{ booking.customerDetails?.lastName }}</span>
+          </div>
+          <div class="info-item">
+            <label>Email</label>
+            <span>{{ booking.customerDetails?.email }}</span>
+          </div>
+          <div class="info-item">
+            <label>Phone</label>
+            <span>{{ booking.customerDetails?.phone }}</span>
+          </div>
+          <div class="info-item">
+            <label>Address</label>
+            <span>{{ booking.customerDetails?.address }}, {{ booking.customerDetails?.city }}, {{ booking.customerDetails?.country }} {{ booking.customerDetails?.zipCode }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="additional-info" *ngIf="booking.specialRequests">
+      <div class="section-header">
+        <h3>Special Requests</h3>
+      </div>
+      <div class="requests-content">
+        <p>{{ booking.specialRequests }}</p>
+      </div>
+    </div>
+
+    <div class="actions">
+      <button class="btn btn-primary" (click)="printConfirmation()">
+        <i class="fas fa-print"></i> Print Confirmation
+      </button>
+      <button class="btn btn-secondary" (click)="goToProfile()">
+        <i class="fas fa-user"></i> View My Bookings
+      </button>
+      <button class="btn btn-outline" (click)="goHome()">
+        <i class="fas fa-home"></i> Back to Home
+      </button>
+    </div>
+  </div>
+
+  <div class="loading" *ngIf="isLoading">
+    <div class="spinner"></div>
+    <p>Loading your booking confirmation...</p>
+  </div>
+
+  <div class="error" *ngIf="error && !isLoading">
+    <div class="error-icon">⚠️</div>
+    <p>{{ error }}</p>
+    <button class="btn btn-primary" (click)="goHome()">Go Home</button>
+  </div>
+</div>

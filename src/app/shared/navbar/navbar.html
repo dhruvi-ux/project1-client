@@ -1,0 +1,142 @@
+<nav class="navbar">
+  <div class="navbar-container">
+    <!-- Logo Section -->
+    <div class="logo" routerLink="/">
+      <span class="logo-icon">✈️</span>
+      <span class="logo-text">LuxWay</span>
+    </div>
+
+    <!-- Navigation Links -->
+    <ul class="nav-links" [class.active]="isMenuOpen">
+      <li><a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">
+        <span class="nav-icon">🏠</span>
+        <span>Home</span>
+      </a></li>
+      <li><a routerLink="/destination" routerLinkActive="active">
+        <span class="nav-icon">🌍</span>
+        <span>Destinations</span>
+      </a></li>
+      <li><a routerLink="/blog" routerLinkActive="active">
+        <span class="nav-icon">📝</span>
+        <span>Blog</span>
+      </a></li>
+      <li><a routerLink="/about" routerLinkActive="active">
+        <span class="nav-icon">ℹ️</span>
+        <span>About</span>
+      </a></li>
+      <li><a routerLink="/contact" routerLinkActive="active">
+        <span class="nav-icon">📞</span>
+        <span>Contact</span>
+      </a></li>
+    </ul>
+
+    <!-- Actions Section -->
+    <div class="actions">
+      <!-- Search Button -->
+      <button class="icon-btn search-btn" (click)="toggleSearch()" title="Search">
+        <span>🔍</span>
+      </button>
+
+      <!-- Dark Mode Toggle -->
+      <button class="icon-btn dark-toggle" (click)="toggleDarkMode()" title="Toggle Theme">
+        <span>{{ isDarkMode ? '☀️' : '🌙' }}</span>
+      </button>
+
+      <!-- If user is NOT logged in -->
+      <div class="auth-buttons" *ngIf="!currentUser">
+        <a routerLink="/login" class="login-btn">
+          <span class="btn-icon">🔐</span>
+          <span>Login</span>
+        </a>
+        <a routerLink="/register" class="register-btn">
+          <span class="btn-icon">✨</span>
+          <span>Sign Up</span>
+        </a>
+      </div>
+
+      <!-- If user IS logged in -->
+      <div class="user-section" *ngIf="currentUser">
+        <!-- Booking Notifications -->
+        <div class="notification-wrapper">
+          <button class="icon-btn notification-btn" (click)="toggleBookingMenu()" title="My Bookings">
+            <span class="notification-icon">🎫</span>
+            <span class="badge" *ngIf="bookingCount > 0">{{ bookingCount }}</span>
+          </button>
+          
+          <div class="dropdown booking-dropdown" *ngIf="showBookingMenu">
+            <div class="dropdown-header">
+              <h4>My Bookings</h4>
+              <span class="count-badge">{{ bookingCount }}</span>
+            </div>
+            <div class="dropdown-body">
+              <div class="empty-state" *ngIf="bookingCount === 0">
+                <span class="empty-icon">📭</span>
+                <p>No bookings yet</p>
+                <a routerLink="/packages" class="action-link" (click)="showBookingMenu = false">Browse Packages</a>
+              </div>
+              <div class="booking-summary" *ngIf="bookingCount > 0">
+                <p>You have {{ bookingCount }} active booking<span *ngIf="bookingCount > 1">s</span></p>
+                <a routerLink="/my-bookings" class="view-all-btn" (click)="showBookingMenu = false">
+                  <span>View All Bookings</span>
+                  <span>→</span>
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- User Profile Menu -->
+        <div class="user-menu-wrapper">
+          <button class="user-profile-btn" (click)="toggleUserMenu()">
+            <span class="user-avatar">{{ getUserInitials() }}</span>
+            <span class="user-name">{{ currentUser.name }}</span>
+            <span class="dropdown-arrow">▼</span>
+          </button>
+          
+          <div class="dropdown user-dropdown" *ngIf="showUserMenu">
+            <div class="user-info">
+              <div class="user-avatar-large">{{ getUserInitials() }}</div>
+              <div class="user-details">
+                <strong>{{ currentUser.name }}</strong>
+                <small>{{ currentUser.email }}</small>
+              </div>
+            </div>
+            <div class="dropdown-divider"></div>
+            <div class="dropdown-menu">
+              <a routerLink="/profile" class="dropdown-item" (click)="showUserMenu = false">
+                <span class="item-icon">👤</span>
+                <span>My Profile</span>
+              </a>
+              <a routerLink="/my-bookings" class="dropdown-item" (click)="showUserMenu = false">
+                <span class="item-icon">🎫</span>
+                <span>My Bookings</span>
+              </a>
+              <button class="dropdown-item logout-item" (click)="logout()">
+                <span class="item-icon">🚪</span>
+                <span>Logout</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Mobile Menu Toggle -->
+      <button class="menu-btn" (click)="toggleMenu()">
+        <span class="menu-icon" [class.active]="isMenuOpen">
+          <span></span>
+          <span></span>
+          <span></span>
+        </span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Search Bar (Expandable) -->
+  <div class="search-bar" [class.active]="showSearch">
+    <div class="search-container">
+      <input type="text" placeholder="Search destinations, packages..." [(ngModel)]="searchQuery" (keyup.enter)="performSearch()">
+      <button class="search-submit" (click)="performSearch()">Search</button>
+      <button class="search-close" (click)="toggleSearch()">✕</button>
+    </div>
+  </div>
+</nav>

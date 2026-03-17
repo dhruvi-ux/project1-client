@@ -1,0 +1,241 @@
+<div class="my-bookings-container">
+  <div class="page-header">
+    <h1>My Bookings</h1>
+    <p>View all your booked travel packages and details</p>
+  </div>
+
+  <!-- Loading State -->
+  <div class="loading-state" *ngIf="isLoading">
+    <div class="spinner"></div>
+    <h3>Loading your bookings...</h3>
+    <p>Please wait while we fetch your booking information</p>
+  </div>
+
+  <!-- Error State -->
+  <div class="error-state" *ngIf="error && !isLoading">
+    <div class="error-content">
+      <h3>{{ error }}</h3>
+      <a routerLink="/login" class="btn btn-primary">Go to Login</a>
+    </div>
+  </div>
+
+  <!-- Empty State -->
+  <div class="empty-state" *ngIf="!isLoading && !error && bookings.length === 0">
+    <div class="empty-content">
+      <h3>No bookings found</h3>
+      <p>You haven't made any bookings yet. Start exploring our packages!</p>
+      <a routerLink="/" class="btn btn-primary">Browse Packages</a>
+    </div>
+  </div>
+
+  <!-- Bookings List -->
+  <div class="bookings-list" *ngIf="!isLoading && !error && bookings.length > 0">
+    <div class="bookings-grid">
+      <div class="booking-card" *ngFor="let booking of bookings; trackBy: trackByBookingId">
+        <div class="booking-header">
+          <div class="package-info">
+            <h3>{{ booking.packageName || booking.packageDetails?.packageName || 'Package Name' }}</h3>
+            <p class="destination">{{ booking.destination || booking.packageDetails?.destination || 'Destination' }}</p>
+          </div>
+          <span 
+            class="status-badge" 
+            [style.background-color]="getStatusColor(booking.status || 'pending')"
+          >
+            {{ (booking.status || 'pending') | titlecase }}
+          </span>
+        </div>
+
+        <div class="booking-details">
+          <div class="detail-row">
+            <span class="label">Travelers:</span>
+            <span class="value">{{ booking.numberOfTravelers || 1 }}</span>
+          </div>
+          <div class="detail-row">
+            <span class="label">Total Amount:</span>
+            <span class="value">{{ formatCurrency(booking.totalAmount || 0) }}</span>
+          </div>
+          <div class="detail-row">
+            <span class="label">Booking Date:</span>
+            <span class="value">{{ formatDate(booking.bookingDate || booking.createdAt) }}</span>
+          </div>
+          <div class="detail-row" *ngIf="booking.packageDetails?.duration">
+            <span class="label">Duration:</span>
+            <span class="value">{{ booking.packageDetails.duration.days }}D/{{ booking.packageDetails.duration.nights }}N</span>
+          </div>
+        </div>
+
+        <div class="customer-info">
+          <h4>Customer Details</h4>
+          <div class="detail-row">
+            <span class="label">Name:</span>
+            <span class="value">{{ booking.customerDetails?.firstName || booking.customerDetails?.name || 'N/A' }} {{ booking.customerDetails?.lastName || '' }}</span>
+          </div>
+          <div class="detail-row">
+            <span class="label">Email:</span>
+            <span class="value">{{ booking.customerDetails?.email || 'N/A' }}</span>
+          </div>
+          <div class="detail-row">
+            <span class="label">Phone:</span>
+            <span class="value">{{ booking.customerDetails?.phone || 'N/A' }}</span>
+          </div>
+        </div>
+
+        <div class="booking-actions">
+          <button class="btn btn-outline" (click)="viewBookingDetails(booking)">View Details</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Pagination -->
+    <div class="pagination" *ngIf="totalPages > 1">
+      <div class="pagination-info">
+        Showing {{ (currentPage - 1) * pageSize + 1 }} to {{ Math.min(currentPage * pageSize, totalBookings) }} of {{ totalBookings }} bookings
+      </div>
+      <div class="pagination-controls">
+        <button 
+          class="btn-pagination" 
+          (click)="previousPage()" 
+          [disabled]="currentPage === 1"
+        >
+          Previous
+        </button>
+        
+        <button 
+          *ngFor="let page of pageNumbers" 
+          class="btn-pagination" 
+          [class.active]="page === currentPage"
+          (click)="goToPage(page)"
+        >
+          {{ page }}
+        </button>
+        
+        <button 
+          class="btn-pagination" 
+          (click)="nextPage()" 
+          [disabled]="currentPage === totalPages"
+        >
+          Next
+        </button>
+      </div>
+    </div>
+  
+    <!-- Booking Details Modal -->
+    <div class="modal-overlay" *ngIf="showBookingModal" (click)="closeBookingModal()">
+      <div class="modal-content" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+          <h3>Booking Details</h3>
+          <button class="close-btn" (click)="closeBookingModal()">&times;</button>
+        </div>
+        
+        <!-- Skeleton shimmer loading state -->
+        <div *ngIf="isLoadingDetails" class="modal-body">
+          <div class="skeleton-wrapper">
+            <div class="section">
+              <div class="skeleton skeleton-title"></div>
+              <div class="skeleton skeleton-text"></div>
+              <div class="skeleton skeleton-text"></div>
+              <div class="skeleton skeleton-text"></div>
+              <div class="skeleton skeleton-text"></div>
+              <div class="skeleton skeleton-text"></div>
+            </div>
+            <div class="section">
+              <div class="skeleton skeleton-title"></div>
+              <div class="skeleton skeleton-text"></div>
+              <div class="skeleton skeleton-text"></div>
+              <div class="skeleton skeleton-text"></div>
+            </div>
+            <div class="section">
+              <div class="skeleton skeleton-title"></div>
+              <div class="skeleton skeleton-text"></div>
+              <div class="skeleton skeleton-text"></div>
+              <div class="skeleton skeleton-text"></div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Booking details content -->
+        <div *ngIf="!isLoadingDetails && currentBooking" class="modal-body">
+          <div class="booking-details-full">
+            <div class="section">
+              <h4>Package Information</h4>
+              <div class="detail-row">
+                <span class="label">Package Name:</span>
+                <span class="value">{{ currentBooking.packageName || 'N/A' }}</span>
+              </div>
+              <div class="detail-row">
+                <span class="label">Destination:</span>
+                <span class="value">{{ currentBooking.destination || 'N/A' }}</span>
+              </div>
+              <div class="detail-row" *ngIf="currentBooking.packageDetails?.duration">
+                <span class="label">Duration:</span>
+                <span class="value">{{ currentBooking.packageDetails.duration.days }} Days / {{ currentBooking.packageDetails.duration.nights }} Nights</span>
+              </div>
+              <div class="detail-row" *ngIf="currentBooking.packageDetails?.price">
+                <span class="label">Price Per Person:</span>
+                <span class="value">{{ formatCurrency(currentBooking.packageDetails.price.amount) }}</span>
+              </div>
+              <div class="detail-row" *ngIf="currentBooking.packageDetails?.packageType">
+                <span class="label">Package Type:</span>
+                <span class="value">{{ currentBooking.packageDetails.packageType }}</span>
+              </div>
+              <div class="detail-row" *ngIf="currentBooking.packageDetails?.accommodation">
+                <span class="label">Accommodation:</span>
+                <span class="value">{{ currentBooking.packageDetails.accommodation }}</span>
+              </div>
+              <div class="detail-row" *ngIf="currentBooking.packageDetails?.transportAndTransfer">
+                <span class="label">Transport & Transfer:</span>
+                <span class="value">{{ currentBooking.packageDetails.transportAndTransfer }}</span>
+              </div>
+              <div class="detail-row" *ngIf="currentBooking.packageDetails?.meals">
+                <span class="label">Meals:</span>
+                <span class="value">{{ currentBooking.packageDetails.meals }}</span>
+              </div>
+              <div class="detail-row">
+                <span class="label">Total Amount:</span>
+                <span class="value">{{ formatCurrency(currentBooking.totalAmount || 0) }}</span>
+              </div>
+              <div class="detail-row">
+                <span class="label">Number of Travelers:</span>
+                <span class="value">{{ currentBooking.numberOfTravelers || 1 }}</span>
+              </div>
+              <div class="detail-row">
+                <span class="label">Status:</span>
+                <span class="value" [style.color]="getStatusColor(currentBooking.status || 'pending')">{{ (currentBooking.status || 'pending') | titlecase }}</span>
+              </div>
+              <div class="detail-row">
+                <span class="label">Booking Date:</span>
+                <span class="value">{{ formatDate(currentBooking.bookingDate || currentBooking.createdAt) }}</span>
+              </div>
+            </div>
+            
+            <div class="section">
+              <h4>Customer Information</h4>
+              <div class="detail-row">
+                <span class="label">Full Name:</span>
+                <span class="value">{{ currentBooking.customerDetails?.firstName }} {{ currentBooking.customerDetails?.lastName }}</span>
+              </div>
+              <div class="detail-row">
+                <span class="label">Email:</span>
+                <span class="value">{{ currentBooking.customerDetails?.email }}</span>
+              </div>
+              <div class="detail-row">
+                <span class="label">Phone:</span>
+                <span class="value">{{ currentBooking.customerDetails?.phone }}</span>
+              </div>
+              <div class="detail-row">
+                <span class="label">Address:</span>
+                <span class="value">{{ currentBooking.customerDetails?.address }}, {{ currentBooking.customerDetails?.city }}, {{ currentBooking.customerDetails?.country }} {{ currentBooking.customerDetails?.zipCode }}</span>
+              </div>
+            </div>
+            
+            <div class="section" *ngIf="currentBooking.specialRequests">
+              <h4>Special Requests</h4>
+              <div class="detail-row">
+                <span class="value">{{ currentBooking.specialRequests }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>

@@ -1,0 +1,131 @@
+<!-- HERO -->
+<section class="contact-hero">
+  <div class="hero-content">
+    <h1>Let’s Connect ✨</h1>
+    <p>
+      Have a question, planning a trip, or need help?  
+      We’re always happy to help you travel better.
+    </p>
+  </div>
+</section>
+
+<!-- MAIN CONTACT AREA -->
+<section class="contact-area">
+
+  <!-- LEFT SIDE -->
+  <div class="contact-left">
+    <h2>Contact Information</h2>
+    <p class="subtitle">
+      Reach out to us anytime — our travel experts are here to guide you.
+    </p>
+
+    <div class="info-list">
+      <div class="info-item">
+        <span>📍</span>
+        <div>
+          <h4>Office Address</h4>
+          <p>Ahmedabad, Gujarat, India</p>
+        </div>
+      </div>
+
+      <div class="info-item">
+        <span>📧</span>
+        <div>
+          <h4>Email Us</h4>
+          <p>support@travelworld.com</p>
+        </div>
+      </div>
+
+      <div class="info-item">
+        <span>📞</span>
+        <div>
+          <h4>Call Us</h4>
+          <p>+91 98765 43210</p>
+        </div>
+      </div>
+
+      <div class="info-item">
+        <span>🕒</span>
+        <div>
+          <h4>Working Hours</h4>
+          <p>Mon – Sat · 9:00 AM – 7:00 PM</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- SMALL MAP -->
+    <div class="mini-map">
+      <iframe
+        src="https://www.google.com/maps?q=Ahmedabad&output=embed"
+        loading="lazy"
+      ></iframe>
+    </div>
+  </div>
+
+  <!-- RIGHT SIDE FORM -->
+  <div class="contact-right">
+    <h2>Send Us a Message</h2>
+    <p class="subtitle">
+      Tell us about your travel plans or questions.
+    </p>
+
+    <!-- Success/Error Messages -->
+    <div *ngIf="successMessage" class="alert alert-success">
+      ✅ {{ successMessage }}
+    </div>
+    <div *ngIf="errorMessage" class="alert alert-error">
+      ❌ {{ errorMessage }}
+    </div>
+
+    <form (ngSubmit)="submitForm()" #contactForm="ngForm">
+      <div class="form-row">
+        <input 
+          type="text" 
+          placeholder="Your Name" 
+          [(ngModel)]="contactData.name" 
+          name="name"
+          required
+        />
+        <input 
+          type="email" 
+          placeholder="Your Email" 
+          [(ngModel)]="contactData.email" 
+          name="email"
+          required
+        />
+      </div>
+
+      <div class="form-row">
+        <input 
+          type="tel" 
+          placeholder="Phone Number" 
+          [(ngModel)]="contactData.phone" 
+          name="phone"
+        />
+        <select 
+          [(ngModel)]="contactData.subject" 
+          name="subject"
+        >
+          <option value="General Inquiry">General Inquiry</option>
+          <option value="Travel Package">Travel Package</option>
+          <option value="Destination Query">Destination Query</option>
+          <option value="Booking Help">Booking Help</option>
+          <option value="Other">Other</option>
+        </select>
+      </div>
+
+      <textarea 
+        rows="5" 
+        placeholder="Your Message" 
+        [(ngModel)]="contactData.message" 
+        name="message"
+        required
+      ></textarea>
+
+      <button type="submit" [disabled]="contactForm.invalid || isLoading">
+        <span *ngIf="!isLoading">Send Message ✈️</span>
+        <span *ngIf="isLoading">Sending...</span>
+      </button>
+    </form>
+  </div>
+</section>

@@ -1,0 +1,158 @@
+<div class="auth-page">
+  <div class="auth-container">
+    <!-- Left Side - Image/Thought Section -->
+    <div class="auth-left">
+      <div class="auth-brand">
+        <h1>🌍 LuxWay</h1>
+      </div>
+      <div class="auth-visual">
+        <div class="visual-content">
+          <h2>Start Your Journey!</h2>
+          <p>Join thousands of travelers discovering amazing destinations. Create your account and unlock exclusive travel experiences.</p>
+          <div class="features">
+            <div class="feature-item">
+              <span class="icon">🌟</span>
+              <span>Exclusive Travel Deals</span>
+            </div>
+            <div class="feature-item">
+              <span class="icon">🎯</span>
+              <span>Personalized Recommendations</span>
+            </div>
+            <div class="feature-item">
+              <span class="icon">🔐</span>
+              <span>Secure & Easy Booking</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right Side - Form Section -->
+    <div class="auth-right">
+      <div class="form-wrapper">
+        <div class="form-header">
+          <h2>Create Account</h2>
+          <p>Fill in your details to get started</p>
+        </div>
+
+        <form (ngSubmit)="register()" #registerForm="ngForm">
+          <div class="input-group">
+            <label for="name">Full Name</label>
+            <div class="input-wrapper">
+              <span class="input-icon">👤</span>
+              <input 
+                type="text" 
+                id="name" 
+                name="name"
+                [(ngModel)]="user.name"
+                required
+                minlength="2"
+                placeholder="John Doe"
+              />
+            </div>
+          </div>
+
+          <div class="input-group">
+            <label for="email">Email Address</label>
+            <div class="input-wrapper">
+              <span class="input-icon">📧</span>
+              <input 
+                type="email" 
+                id="email" 
+                name="email"
+                [(ngModel)]="user.email"
+                required
+                email
+                placeholder="your@email.com"
+              />
+            </div>
+          </div>
+
+          <div class="input-group">
+            <label for="phone">Phone Number</label>
+            <div class="input-wrapper">
+              <span class="input-icon">📱</span>
+              <input 
+                type="tel" 
+                id="phone" 
+                name="phone"
+                [(ngModel)]="user.phone"
+                required
+                placeholder="+1 234 567 8900"
+              />
+            </div>
+          </div>
+
+          <div class="input-group">
+            <label for="password">Password</label>
+            <div class="input-wrapper">
+              <span class="input-icon">🔒</span>
+              <input 
+                [type]="showPassword ? 'text' : 'password'" 
+                id="password" 
+                name="password"
+                [(ngModel)]="user.password"
+                required
+                minlength="6"
+                placeholder="Create a password"
+              />
+              <button 
+                type="button" 
+                class="toggle-password" 
+                (click)="togglePasswordVisibility()"
+              >
+                {{ showPassword ? '👁️' : '👁️‍🗨️' }}
+              </button>
+            </div>
+          </div>
+
+          <div class="input-group">
+            <label for="confirmPassword">Confirm Password</label>
+            <div class="input-wrapper">
+              <span class="input-icon">🔒</span>
+              <input 
+                [type]="showConfirmPassword ? 'text' : 'password'" 
+                id="confirmPassword" 
+                name="confirmPassword"
+                [(ngModel)]="user.confirmPassword"
+                required
+                placeholder="Confirm your password"
+                [class.error]="user.password && user.confirmPassword && user.password !== user.confirmPassword"
+              />
+              <button 
+                type="button" 
+                class="toggle-password" 
+                (click)="toggleConfirmPasswordVisibility()"
+              >
+                {{ showConfirmPassword ? '👁️' : '👁️‍🗨️' }}
+              </button>
+            </div>
+            <div 
+              class="error-msg small" 
+              *ngIf="user.password && user.confirmPassword && user.password !== user.confirmPassword"
+            >
+              Passwords do not match
+            </div>
+          </div>
+
+          <button type="submit" class="submit-btn" [disabled]="registerForm.invalid || loading">
+            <span *ngIf="!loading">Create Account</span>
+            <span *ngIf="loading" class="spinner"></span>
+          </button>
+
+          <div class="error-msg" *ngIf="errorMessage">
+            {{ errorMessage }}
+          </div>
+
+          <div class="divider">
+            <span>or</span>
+          </div>
+
+          <div class="alt-action">
+            <p>Already have an account? <a routerLink="/login">Sign in</a></p>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>

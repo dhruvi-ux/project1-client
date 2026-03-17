@@ -1,0 +1,188 @@
+<div class="blog-detail-page" *ngIf="!isLoading && blog">
+  <!-- Hero Section -->
+  <section class="hero-section">
+    <div class="hero-image-container">
+      <img 
+        [src]="blog.image" 
+        [alt]="blog.title" 
+        class="hero-image"
+        loading="eager"
+        fetchpriority="high">
+      <div class="hero-overlay"></div>
+    </div>
+    <div class="hero-content">
+      <button class="back-button" (click)="goBack()">
+        <span class="back-icon">←</span>
+        <span>Back to Blog</span>
+      </button>
+      <div class="category-badge">{{ blog.category }}</div>
+      <h1 class="hero-title">{{ blog.title }}</h1>
+      <div class="hero-meta">
+        <div class="meta-item">
+          <span class="meta-icon">👤</span>
+          <span>{{ blog.author }}</span>
+        </div>
+        <div class="meta-divider">•</div>
+        <div class="meta-item">
+          <span class="meta-icon">📅</span>
+          <span>{{ formatDate(blog.createdAt) }}</span>
+        </div>
+        <div class="meta-divider">•</div>
+        <div class="meta-item">
+          <span class="meta-icon">⏱️</span>
+          <span>{{ blog.readTime }}</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Content Section -->
+  <section class="content-section">
+    <div class="container">
+      <div class="content-wrapper">
+        <!-- Main Content -->
+        <article class="main-content">
+          <!-- Excerpt -->
+          <div class="excerpt-box">
+            <p class="excerpt-text">{{ blog.excerpt }}</p>
+          </div>
+
+          <!-- Formatted Content -->
+          <div class="article-content">
+            <ng-container *ngFor="let section of formattedContent; trackBy: trackByIndex">
+              <!-- Main Heading -->
+              <h2 class="content-heading" *ngIf="section.type === 'heading'">
+                <span class="heading-icon">✦</span>
+                {{ section.text }}
+              </h2>
+
+              <!-- Subheading -->
+              <h3 class="content-subheading" *ngIf="section.type === 'subheading'">
+                {{ section.text }}
+              </h3>
+
+              <!-- Paragraph -->
+              <p class="content-paragraph" *ngIf="section.type === 'paragraph'">
+                {{ section.text }}
+              </p>
+
+              <!-- List -->
+              <ul class="content-list" *ngIf="section.type === 'list'">
+                <li *ngFor="let item of section.items; trackBy: trackByIndex" class="list-item">
+                  <span class="list-bullet">▸</span>
+                  <span class="list-text">{{ item }}</span>
+                </li>
+              </ul>
+            </ng-container>
+          </div>
+
+          <!-- Tags -->
+          <div class="tags-section" *ngIf="blog.tags && blog.tags.length > 0">
+            <h3 class="tags-title">Tags</h3>
+            <div class="tags-container">
+              <span class="tag" *ngFor="let tag of blog.tags; trackBy: trackByIndex">{{ tag }}</span>
+            </div>
+          </div>
+
+          <!-- Share Section -->
+          <div class="share-section">
+            <h3 class="share-title">Share this article</h3>
+            <div class="share-buttons">
+              <button class="share-btn facebook">
+                <span class="share-icon">f</span>
+                <span>Facebook</span>
+              </button>
+              <button class="share-btn twitter">
+                <span class="share-icon">𝕏</span>
+                <span>Twitter</span>
+              </button>
+              <button class="share-btn linkedin">
+                <span class="share-icon">in</span>
+                <span>LinkedIn</span>
+              </button>
+              <button class="share-btn copy">
+                <span class="share-icon">🔗</span>
+                <span>Copy Link</span>
+              </button>
+            </div>
+          </div>
+        </article>
+
+        <!-- Sidebar -->
+        <aside class="sidebar">
+          <!-- Author Card -->
+          <div class="author-card">
+            <div class="author-avatar">{{ blog.author.charAt(0) }}</div>
+            <h3 class="author-name">{{ blog.author }}</h3>
+            <p class="author-bio">Travel writer and adventure enthusiast sharing stories from around the world.</p>
+          </div>
+
+          <!-- Table of Contents -->
+          <div class="toc-card">
+            <h3 class="toc-title">Table of Contents</h3>
+            <ul class="toc-list">
+              <li class="toc-item" *ngFor="let section of formattedContent; trackBy: trackByIndex">
+                <a class="toc-link" *ngIf="section.type === 'heading'">
+                  {{ section.text }}
+                </a>
+              </li>
+            </ul>
+          </div>
+
+          <!-- Newsletter Card -->
+          <div class="newsletter-card">
+            <div class="newsletter-icon">✉️</div>
+            <h3 class="newsletter-title">Stay Updated</h3>
+            <p class="newsletter-text">Get the latest travel stories delivered to your inbox.</p>
+            <form class="newsletter-form">
+              <input type="email" placeholder="Your email" class="newsletter-input">
+              <button type="submit" class="newsletter-button">Subscribe</button>
+            </form>
+          </div>
+        </aside>
+      </div>
+    </div>
+  </section>
+
+  <!-- Related Blogs -->
+  <section class="related-section" *ngIf="relatedBlogs.length > 0">
+    <div class="container">
+      <h2 class="related-title">Related Articles</h2>
+      <div class="related-grid">
+        <article class="related-card" *ngFor="let relatedBlog of relatedBlogs; trackBy: trackByBlogId" (click)="viewBlog(relatedBlog._id)">
+          <div class="related-image-container">
+            <img 
+              [src]="relatedBlog.image" 
+              [alt]="relatedBlog.title" 
+              class="related-image"
+              loading="lazy"
+              decoding="async">
+            <div class="related-category">{{ relatedBlog.category }}</div>
+          </div>
+          <div class="related-content">
+            <h3 class="related-card-title">{{ relatedBlog.title }}</h3>
+            <p class="related-excerpt">{{ relatedBlog.excerpt }}</p>
+            <div class="related-meta">
+              <span class="related-date">{{ formatDate(relatedBlog.createdAt) }}</span>
+              <span class="related-read-time">{{ relatedBlog.readTime }}</span>
+            </div>
+          </div>
+        </article>
+      </div>
+    </div>
+  </section>
+</div>
+
+<!-- Loading State -->
+<div class="loading-container" *ngIf="isLoading">
+  <div class="spinner"></div>
+  <p class="loading-text">Loading article...</p>
+</div>
+
+<!-- Error State -->
+<div class="error-container" *ngIf="error && !isLoading">
+  <div class="error-icon">😕</div>
+  <h3 class="error-title">Article Not Found</h3>
+  <p class="error-message">{{ error }}</p>
+  <button class="error-button" (click)="goBack()">Back to Blog</button>
+</div>
