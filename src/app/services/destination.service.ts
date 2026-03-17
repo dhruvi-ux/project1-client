@@ -9,7 +9,7 @@ import { Destination } from '../models/destination.model';
 })
 export class DestinationService {
 
-  private apiUrl = `${environment.apiUrl}/contacts`;
+  private apiUrl = `${environment.apiUrl}/destinations`;
   constructor(private http: HttpClient) {}
 
   getDestinations(): Observable<Destination[]> {
